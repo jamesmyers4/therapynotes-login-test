@@ -54,8 +54,7 @@ namespace TherapyNotesUITests
             Assert.True(welcomeHeader.Displayed);
             Assert.Contains("Welcome", welcomeHeader.Text);
             Assert.Contains("/app/", driver.Url);
-            //System.Threading.Thread.Sleep(10000);
-            //turn ON for Landing Page access
+            
         }
 
         public void Dispose()
