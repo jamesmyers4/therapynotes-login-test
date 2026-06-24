@@ -18,7 +18,7 @@ namespace TherapyNotesUITests.Pages
         {
             driver.Navigate().GoToUrl("https://www.therapynotes.com");
             wait.Until(d => d.FindElement(By.CssSelector("a[href='/app/login/']")).Displayed);
-        }
+                    }
 
         public void ClickLoginLink()
         {
@@ -38,6 +38,23 @@ namespace TherapyNotesUITests.Pages
             driver.FindElement(By.Id("Login__UsernameField")).SendKeys(username);
             driver.FindElement(By.Id("Login__Password")).SendKeys(password);
             driver.FindElement(By.Id("Login__LogInButton")).Click();
+        }
+
+        public bool IsErrorMessageDisplayed()
+        {
+            try
+            {
+                wait.Until(d => d.FindElement(By.CssSelector("[data-testid='login-banner-error-message']")).Displayed);
+                return driver.FindElement(By.CssSelector("[data-testid='login-banner-error-message']")).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+            catch (WebDriverTimeoutException)
+            {
+                return false;
+            }
         }
     }
 }

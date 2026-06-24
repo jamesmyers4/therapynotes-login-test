@@ -20,6 +20,19 @@ namespace TherapyNotesUITests.Pages
             return driver.Url.Contains("/app/");
         }
 
+        public bool IsWelcomeHeaderDisplayed()
+        {
+            try
+            {
+                wait.Until(d => d.FindElement(By.CssSelector("[data-testid='home-welcome-header']")).Displayed);
+                return driver.FindElement(By.CssSelector("[data-testid='home-welcome-header']")).Displayed;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+
         public string GetWelcomeText()
         {
             wait.Until(d => {
