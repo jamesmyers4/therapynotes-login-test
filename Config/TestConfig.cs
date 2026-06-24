@@ -2,12 +2,18 @@
 {
     public static class TestConfig
     {
-        public const string BaseUrl = "https://www.therapynotes.com";
-        public const string PracticeCode = "QAInterviewPractice";
-        public const string Username = "TestUser";
-        public const string Password = "HorshamPA19044@@";
-        public const string LoginPath = "/app/login/";
-        public const string DashboardPath = "/app/";
-        public const bool Headless = true;
+        public static readonly string BaseUrl = "https://www.therapynotes.com";
+        public static readonly string LoginPath = "/app/login/";
+        public static readonly string DashboardPath = "/app/";
+        public static readonly string PracticeCode =
+            Environment.GetEnvironmentVariable("TN_PRACTICE_CODE") ?? "QAInterviewPractice";
+        public static readonly string Username =
+            Environment.GetEnvironmentVariable("TN_USERNAME") ?? "TestUser";
+        public static readonly string Password =
+            Environment.GetEnvironmentVariable("TN_PASSWORD") ?? "";
+        public static readonly bool Headless =
+            Environment.GetEnvironmentVariable("TN_HEADLESS") is string h
+                ? bool.Parse(h)
+                : false;
     }
 }
