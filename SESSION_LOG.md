@@ -55,6 +55,29 @@ The scaffold checked a generic `h1` element.
 - Added URL assertion `Assert.Contains("/app/", driver.Url)`
 - Avoided asserting the specific user's name to prevent brittle data-dependent failures
 
+### 7. Refactored to Page Object Model
+The initial implementation had all selectors and interactions inline in the test method.
+
+**Fix:** Refactored into three files following POM convention:
+- `Pages/LoginPage.cs` — encapsulates homepage navigation, login link, 
+  practice code entry, and credential entry
+- `Pages/DashboardPage.cs` — encapsulates post-login verification (URL check, 
+  welcome header text)
+- `Tests/LoginTests.cs` — clean test method that reads like plain English, 
+  no raw selectors
+
+**Why:** In a real test suite, raw selectors scattered through test methods 
+become a maintenance nightmare. POM centralizes element definitions so a 
+selector change only needs to be updated in one place.
+
+## Final Project Structure
+Pages/
+  LoginPage.cs
+  DashboardPage.cs
+Tests/
+  LoginTests.cs
+
+
 ## Final Test Runtime
 ~4.2 seconds consistently
 

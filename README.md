@@ -1,13 +1,18 @@
 ﻿# TherapyNotes Login Test
 
 A Selenium WebDriver test written in C# and xUnit validating the login flow 
-for TherapyNotes.com.
+for TherapyNotes.com, implemented using the Page Object Model pattern.
 
 ## Tech Stack
 - C# / .NET 10
 - xUnit
 - Selenium WebDriver 4.x
 - ChromeDriver (managed automatically via Selenium Manager)
+- Page Object Model (POM) design pattern
+
+## Project Structure
+- `Pages/` — LoginPage.cs, DashboardPage.cs
+- `Tests/` — LoginTests.cs
 
 ## What It Tests
 - Navigation to TherapyNotes.com
