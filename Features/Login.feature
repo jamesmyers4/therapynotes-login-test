@@ -16,6 +16,7 @@
     Then I should see a login error message
     And the URL should remain on the login page
 
+  @Destructive
   Scenario: Invalid credentials show error message
     Given I navigate to the TherapyNotes homepage
     And I enter a valid practice code and click Continue

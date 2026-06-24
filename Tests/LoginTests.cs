@@ -63,6 +63,7 @@ namespace TherapyNotesUITests.Tests
         }
 
         [Fact]
+        [Trait("Category", "Destructive")]
         public void InvalidCredentials_ShowsErrorMessage()
         {
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
