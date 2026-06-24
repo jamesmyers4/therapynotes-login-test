@@ -79,7 +79,9 @@ Tests/
 
 
 ## Final Test Runtime
-~4.2 seconds consistently
+~4.2 seconds consistently (local environment). Actual runtime will vary by environment but 
+explicit waits ensure the test moves as fast as the page allows rather than waiting fixed 
+delays.
 
 ## Key Learnings
 - Always inspect real DOM elements rather than assuming field IDs
