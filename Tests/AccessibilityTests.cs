@@ -12,7 +12,14 @@ namespace TherapyNotesUITests.Tests
 
         public AccessibilityTests()
         {
-            driver = new ChromeDriver();
+            var options = new ChromeOptions();
+            if (TestConfig.Headless)
+            {
+                options.AddArgument("--headless");
+                options.AddArgument("--no-sandbox");
+                options.AddArgument("--disable-dev-shm-usage");
+            }
+            driver = new ChromeDriver(options);
             driver.Manage().Window.Maximize();
         }
 
@@ -46,6 +53,28 @@ namespace TherapyNotesUITests.Tests
             wait.Until(d => d.FindElement(By.Id("Login__UsernameField")).Displayed);
             var usernameField = driver.FindElement(By.Id("Login__UsernameField"));
             Assert.False(string.IsNullOrEmpty(usernameField.GetAttribute("aria-describedby")));
+        }
+
+        [Fact]
+        public void PasswordField_MasksInput()
+        {
+            driver.Navigate().GoToUrl(TestConfig.BaseUrl + "/app/login/");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var loginPage = new LoginPage(driver, wait);
+            loginPage.EnterPracticeCode(TestConfig.PracticeCode);
+            wait.Until(d => d.FindElement(By.Id("Login__Password")).Displayed);
+            var passwordField = driver.FindElement(By.Id("Login__Password"));
+            Assert.Equal("password", passwordField.GetAttribute("type"));
+        }
+
+        [Fact]
+        public void PracticeCodeField_EnforcesMaxLength()
+        {
+            driver.Navigate().GoToUrl(TestConfig.BaseUrl + "/app/login/");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.FindElement(By.Id("PracticeCode")).Displayed);
+            var practiceCodeField = driver.FindElement(By.Id("PracticeCode"));
+            Assert.Equal("32", practiceCodeField.GetAttribute("maxlength"));
         }
 
         public void Dispose()

@@ -12,7 +12,14 @@ namespace TherapyNotesUITests.Tests
 
         public LoginTests()
         {
-            driver = new ChromeDriver();
+            var options = new ChromeOptions();
+            if (TestConfig.Headless)
+            {
+                options.AddArgument("--headless");
+                options.AddArgument("--no-sandbox");
+                options.AddArgument("--disable-dev-shm-usage");
+            }
+            driver = new ChromeDriver(options);
             driver.Manage().Window.Maximize();
         }
 
@@ -106,6 +113,44 @@ namespace TherapyNotesUITests.Tests
                 Assert.Equal("true", loginButton.GetAttribute("aria-disabled"));
             }
             Assert.Contains("/app/login/", driver.Url);
+        }
+
+        [Fact]
+        public void ForgotPracticeCode_LinkIsVisible()
+        {
+            driver.Navigate().GoToUrl(TestConfig.BaseUrl + "/app/login/");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.FindElement(By.Id("Continue__ContinueButton")).Displayed);
+            var forgotLink = driver.FindElement(By.CssSelector("[data-testid='login-forgot-practice-code-link']"));
+            Assert.True(forgotLink.Displayed);
+        }
+
+        [Fact]
+        public void ForgotPracticeCode_LinkNavigatesToCorrectUrl()
+        {
+            driver.Navigate().GoToUrl(TestConfig.BaseUrl + "/app/login/");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.FindElement(By.Id("Continue__ContinueButton")).Displayed);
+            var forgotLink = driver.FindElement(By.CssSelector("[data-testid='login-forgot-practice-code-link']"));
+            forgotLink.Click();
+            wait.Until(d => d.Url.Contains("/help/login/lostpractice/"));
+            Assert.Contains("/help/login/lostpractice/", driver.Url);
+        }
+
+        [Fact]
+        public void LoginPage_LoadsOverHttps()
+        {
+            driver.Navigate().GoToUrl(TestConfig.BaseUrl + "/app/login/");
+            Assert.StartsWith("https://", driver.Url);
+        }
+
+        [Fact]
+        public void LoginPage_HasCorrectTitle()
+        {
+            driver.Navigate().GoToUrl(TestConfig.BaseUrl + "/app/login/");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait.Until(d => d.Title.Length > 0);
+            Assert.Contains("TherapyNotes", driver.Title);
         }
         public void Dispose()
         {

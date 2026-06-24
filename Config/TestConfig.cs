@@ -8,5 +8,6 @@
         public const string Password = "HorshamPA19044@@";
         public const string LoginPath = "/app/login/";
         public const string DashboardPath = "/app/";
+        public const bool Headless = true;
     }
 }
