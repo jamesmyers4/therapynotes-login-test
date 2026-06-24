@@ -14,10 +14,12 @@ real test suite in a professional shop would be.
 ## Tech Stack
 - **Language:** C# / .NET 10
 - **Test Framework:** xUnit ([Fact], [Theory], [InlineData])
+- **BDD Framework:** Reqnroll (SpecFlow successor) with Gherkin feature files
 - **Browser Automation:** Selenium WebDriver 4.x
 - **Driver Management:** Selenium Manager (built into Selenium 4.6+, no manual ChromeDriver install)
 - **Design Pattern:** Page Object Model (POM)
 - **API Testing:** HttpClient + System.Text.Json
+- **CI/CD:** GitHub Actions
 - **IDE:** Visual Studio 2022
 
 ---
@@ -25,22 +27,28 @@ real test suite in a professional shop would be.
 ## Project Structure
 ```
 TherapyNotesUITests/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # GitHub Actions CI workflow
 ├── Config/
-│   └── TestConfig.cs         # Centralized config — URLs, credentials, headless toggle
+│   └── TestConfig.cs             # Centralized config — URLs, credentials, headless toggle
+├── Features/
+│   └── Login.feature             # Reqnroll Gherkin scenarios
 ├── Pages/
-│   ├── LoginPage.cs          # Homepage nav, login link, practice code, credentials
-│   └── DashboardPage.cs      # Post-login verification — URL check, welcome header
+│   ├── LoginPage.cs              # Homepage nav, login link, practice code, credentials
+│   └── DashboardPage.cs          # Post-login verification — URL check, welcome header
+├── StepDefinitions/
+│   └── LoginSteps.cs             # Reqnroll step bindings wired to POM
 ├── Tests/
-│   ├── LoginTests.cs         # Happy path, negative, data-driven (10 tests)
-│   ├── AccessibilityTests.cs # aria labels, disabled state, input constraints (5 tests)
-│   ├── SecurityTests.cs      # HTTPS, password masking, auth redirect (3 tests)
-│   ├── ResponsiveTests.cs    # iPhone 14, iPad, Desktop viewports (3 tests)
-│   └── ApiTests.cs           # HTTP layer demo via JSONPlaceholder (4 tests)
+│   ├── LoginTests.cs             # Happy path, negative, data-driven (10 tests)
+│   ├── AccessibilityTests.cs     # aria labels, disabled state, input constraints (5 tests)
+│   ├── SecurityTests.cs          # HTTPS, password masking, auth redirect (3 tests)
+│   ├── ResponsiveTests.cs        # iPhone 14, iPad, Desktop viewports (3 tests)
+│   └── ApiTests.cs               # HTTP layer demo via JSONPlaceholder (4 tests)
 ├── README.md
-├── SESSION_LOG.md            # Full implementation history and decisions
-└── CONTEXT.md                # This file
+├── SESSION_LOG.md                # Full implementation history and decisions
+└── CONTEXT.md                    # This file
 ```
-
 ---
 
 ## Architecture Decisions
@@ -103,7 +111,7 @@ TherapyNotes uses a two-step login that the original scaffold was unaware of:
 | Welcome header | data-testid="home-welcome-header" |
 | Error banner | data-testid="login-banner-error-message" |
 | Forgot practice code | data-testid="login-forgot-practice-code-link" |
-
+| Lockout dialog | data-testid="login-error-dialog-message" |
 ---
 
 ## Test Suite Summary
@@ -114,11 +122,22 @@ TherapyNotes uses a two-step login that the original scaffold was unaware of:
 | SecurityTests | 3 | HTTPS enforcement, password masking, auth redirect |
 | ResponsiveTests | 3 | Mobile/tablet/desktop viewport validation |
 | ApiTests | 4 | HTTP layer patterns via JSONPlaceholder |
-| **Total** | **25** | |
+| Reqnroll (BDD) | 3 | Gherkin scenarios — happy path, invalid code, invalid credentials |
+| **Total** | **28** | |
 
-**Full suite runtime:** ~55 seconds (headless, local environment)
+**Full suite runtime:** ~27 seconds non-destructive (26 tests); ~75 seconds full suite (28 tests)
 **API tests:** 67-144ms each (no browser overhead)
+**BDD scenarios:** 3-5 seconds each (browser-driven)
 **UI tests:** 1.5-5 seconds each (network-bound, not render-bound)
+
+---
+
+## Test Categories
+Tests are tagged by risk profile to prevent accidental account lockout:
+- [Trait("Category", "Destructive")] in xUnit — tests that submit invalid credentials
+- @Destructive in Reqnroll — BDD scenarios that submit invalid credentials
+- Standard run (excludes destructive): `dotnet test --filter "Category!=Destructive"`
+- Deliberate destructive run: `dotnet test --filter "Category=Destructive"`
 
 ---
 
@@ -128,6 +147,9 @@ TherapyNotes uses a two-step login that the original scaffold was unaware of:
 - **Rate limiting / lockout** — would lock the test account, destructive
 - **Internal API routes** — not publicly documented, require internal auth tokens
 - **Database layer** — no access to TherapyNotes internal infrastructure
+- - **Account lockout** — triggering lockout requires 5+ failed logins and locks 
+  the real account for 15 minutes. Discovered during test development and documented 
+  in SESSION_LOG entry #19. Tagged as Destructive to prevent accidental triggering.
 
 All of the above are valid test cases in a real team context with proper
 test environment access.
@@ -139,14 +161,15 @@ test environment access.
 - Test credentials (QAInterviewPractice / TestUser) provided by TherapyNotes for assessment
 - Manual login with these credentials does not work — account appears to be
   automation-only by design (possible IP restriction or session configuration)
-- ApiTests use JSONPlaceholder as a structural demonstration — not TherapyNotes' real API
+- ApiTests use JSONPlaceholder as a structural demonstration — not TherapyNotes' real API 
+- Destructive tests (invalid credential submissions) are tagged [Trait("Category", "Destructive")] 
+  and excluded from standard runs to prevent account lockout
 
 ---
 
 ## If Expanding This Suite
 - Add appsettings.json for environment-specific config
-- Add GitHub Actions CI/CD workflow (dotnet test, headless mode)
-- Add SpecFlow/Gherkin layer for BDD coverage
 - Add parallel test execution (xUnit supports this natively)
 - Add screenshot on failure for debugging
 - Add Allure or similar for test reporting
+- Add AccountLockout_ShowsLockoutDialog test against a dedicated lockout account

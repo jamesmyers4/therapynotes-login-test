@@ -230,6 +230,14 @@ proper test environment this would run against a dedicated lockout test
 account or a staging environment where accounts can be reset
 programmatically. Flagged as a known gap with documented reasoning.
 
+To mitigate lockout risk during normal runs, invalid credential tests
+were tagged with [Trait("Category", "Destructive")] in xUnit and
+@Destructive in Reqnroll. These tests are excluded from standard runs
+via --filter "Category!=Destructive" and run deliberately when needed.
+This maps to a real-world pattern of categorizing tests by risk profile:
+Smoke (safe, every commit), Regression (full suite, nightly), and
+Destructive (deliberate, never unattended against production).
+
 ## Final Project Structure
 Pages/
   LoginPage.cs

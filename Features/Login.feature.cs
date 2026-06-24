@@ -214,15 +214,17 @@ namespace TherapyNotesUITests.Features
         [global::Xunit.SkippableFactAttribute(DisplayName="Invalid credentials show error message")]
         [global::Xunit.TraitAttribute("FeatureTitle", "Login")]
         [global::Xunit.TraitAttribute("Description", "Invalid credentials show error message")]
+        [global::Xunit.TraitAttribute("Category", "Destructive")]
         public async global::System.Threading.Tasks.Task InvalidCredentialsShowErrorMessage()
         {
-            string[] tagsOfScenario = ((string[])(null));
+            string[] tagsOfScenario = new string[] {
+                    "Destructive"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
             string pickleIndex = "2";
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Invalid credentials show error message", null, tagsOfScenario, argumentsOfScenario, featureTags, pickleIndex);
             string[] tagsOfRule = ((string[])(null));
             global::Reqnroll.RuleInfo ruleInfo = null;
-#line 19
+#line 20
   this.ScenarioInitialize(scenarioInfo, ruleInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -232,19 +234,19 @@ namespace TherapyNotesUITests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 20
+#line 21
     await testRunner.GivenAsync("I navigate to the TherapyNotes homepage", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 21
+#line 22
     await testRunner.AndAsync("I enter a valid practice code and click Continue", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 22
+#line 23
     await testRunner.AndAsync("I enter invalid credentials and click Log In", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
-#line 23
+#line 24
     await testRunner.ThenAsync("I should see a login error message", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
-#line 24
+#line 25
     await testRunner.AndAsync("the URL should remain on the login page", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
 #line hidden
             }
