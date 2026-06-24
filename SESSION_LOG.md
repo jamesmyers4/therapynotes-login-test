@@ -141,6 +141,50 @@ possible is faster, cheaper, and more reliable than browser-driven tests.
 API test suites would target internal endpoints with environment-specific
 base URLs stored in TestConfig.
 
+### 13. Security test coverage
+No security-focused assertions existed in the initial implementation.
+
+**Fix:** Added `SecurityTests.cs` with three tests:
+- `LoginPage_ServedOverHttps` — verifies the login page is served over HTTPS
+- `PasswordField_TypeAttributeIsPassword` — verifies password input is masked
+- `DirectDashboardAccess_RedirectsToLogin` — verifies unauthenticated users
+  cannot access the dashboard directly and are redirected to login
+
+**Why:** In healthcare software, security validation is non-negotiable.
+HIPAA-adjacent systems must enforce HTTPS, mask sensitive input, and
+prevent unauthorized access. These tests verify TherapyNotes implements
+all three correctly.
+
+### 14. Responsive layout testing
+No viewport or device testing existed in the initial implementation.
+
+**Fix:** Added `ResponsiveTests.cs` using [Theory] with [InlineData] to
+test three viewports in one method:
+- 390x844 — iPhone 14
+- 768x1024 — iPad
+- 1920x1080 — Desktop
+
+Each assertion includes the device name in the failure message for
+immediate identification of which viewport broke.
+
+**Why:** TherapyNotes serves clinicians who may access the platform from
+any device. The login form must be functional at every viewport.
+[Theory] with device-labeled assertions makes failures immediately
+actionable without running tests one at a time.
+
+### 15. Headless Chrome toggle via TestConfig
+Tests previously always ran with a visible browser, making CI/CD
+integration impossible and local runs visually noisy.
+
+**Fix:** Added `Headless` boolean to `TestConfig.cs`. All test class
+constructors check this value and apply Chrome options accordingly.
+Flip one value to switch all tests between headed and headless mode.
+
+**Why:** CI/CD environments like GitHub Actions have no display — headless
+is required for automated pipeline runs. The toggle also allows developers
+to run headless locally when visual confirmation isn't needed, reducing
+distraction without losing the ability to watch tests run when debugging.
+
 ## Final Project Structure
 Pages/
   LoginPage.cs
@@ -148,16 +192,19 @@ Pages/
 Tests/
   LoginTests.cs
   AccessibilityTests.cs
+  SecurityTests.cs
+  ResponsiveTests.cs
   ApiTests.cs
 Config/
   TestConfig.cs
 
 ## Final Test Suite
-- 13 tests total across 3 test classes
-- Full suite runtime: ~29 seconds
-- UI tests: 2-4 seconds each (browser-driven)
-- API tests: 72-156ms each (pure HTTP, no browser)
+- 25 tests total across 5 test classes
+- Full suite runtime: ~55 seconds (headless, local environment)
+- UI tests: 1.5-5 seconds each (browser-driven)
+- API tests: 67-144ms each (pure HTTP, no browser)
 - All UI tests use explicit waits — no static Thread.Sleep
+- Headless toggle via TestConfig.Headless
 
 ## Key Learnings
 - Always inspect real DOM elements rather than assuming field IDs
@@ -170,3 +217,6 @@ Config/
 - [Theory] with [InlineData] eliminates test duplication for data-driven scenarios
 - POM centralizes selectors so one UI change requires one code change
 - API tests run 20-50x faster than UI tests — push coverage down the stack where possible
+- Headless mode is required for CI/CD and reduces visual noise in local runs
+- Security and accessibility are first-class test concerns in healthcare software
+- Responsive testing with labeled assertion messages makes viewport failures immediately actionable
