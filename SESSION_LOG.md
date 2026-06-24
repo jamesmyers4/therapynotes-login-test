@@ -185,6 +185,51 @@ is required for automated pipeline runs. The toggle also allows developers
 to run headless locally when visual confirmation isn't needed, reducing
 distraction without losing the ability to watch tests run when debugging.
 
+### 16. Reqnroll BDD layer added
+Added a Gherkin feature file and step definitions using Reqnroll (the actively
+maintained SpecFlow successor) covering three login scenarios:
+- Successful login with valid credentials
+- Invalid practice code shows error message  
+- Invalid credentials show error message
+
+Step definitions wire directly to existing POM methods — no duplication.
+The [Given] attribute is used throughout since Reqnroll inherits keyword
+context from And steps, requiring the preceding keyword's attribute type.
+
+Note: The successful login scenario shares the same known constraint as
+LoginToTherapyNotes — the test account does not complete a real dashboard
+load against the live production site. Both tests are structurally correct
+and pass when valid session credentials are available.
+
+### 17. GitHub Actions CI workflow added
+Added .github/workflows/ci.yml triggering on push and pull_request to main.
+Credentials injected via GitHub Secrets as TN_PRACTICE_CODE, TN_USERNAME,
+TN_PASSWORD. TN_HEADLESS hardcoded to true for CI environment.
+
+### 18. TestConfig refactored to read from environment variables
+Credentials moved out of hardcoded constants into Environment.GetEnvironmentVariable
+calls with fallback values. Prevents credential exposure in source control.
+Password fallback is an empty string — real value lives in env vars and GitHub Secrets only.
+
+### 19. Account lockout behavior discovered during test execution
+During repeated test runs while debugging the Reqnroll BDD layer, the
+TherapyNotes test account triggered the platform's lockout mechanism —
+5 or more failed login attempts within 15 minutes locks the account
+for 15 minutes.
+
+This surfaced a previously undocumented data-testid:
+- data-testid="login-error-dialog-message" — lockout dialog message
+
+This is distinct from data-testid="login-banner-error-message" which
+appears on standard invalid credential errors.
+
+A test for this behavior (AccountLockout_ShowsLockoutDialog) is a valid
+addition but cannot be run in isolation against production — it requires
+triggering 5 failed logins first, which locks a real account. In a
+proper test environment this would run against a dedicated lockout test
+account or a staging environment where accounts can be reset
+programmatically. Flagged as a known gap with documented reasoning.
+
 ## Final Project Structure
 Pages/
   LoginPage.cs
