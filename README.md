@@ -1,5 +1,7 @@
 ﻿# TherapyNotes Login Test
 
+![CI](https://github.com/jamesmyers4/therapynotes-login-test/actions/workflows/ci.yml/badge.svg)
+
 A Selenium WebDriver test written in C# and xUnit validating the login flow 
 for TherapyNotes.com, implemented using the Page Object Model pattern.
 

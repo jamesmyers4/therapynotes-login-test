@@ -152,6 +152,12 @@ namespace TherapyNotesUITests.Tests
             wait.Until(d => d.Title.Length > 0);
             Assert.Contains("TherapyNotes", driver.Title);
         }
+
+        [Fact]
+        public void Debug_PasswordIsSet()
+        {
+            Assert.False(string.IsNullOrEmpty(TestConfig.Password));
+        }
         public void Dispose()
         {
             driver.Quit();
