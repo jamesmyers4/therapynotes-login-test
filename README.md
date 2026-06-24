@@ -57,6 +57,21 @@ Config/
 3. Restore NuGet packages
 4. Run via Test Explorer or `dotnet test`
 
+## Setup
+
+Before running tests, set the following environment variables with the 
+credentials provided by TherapyNotes:
+
+```powershell
+[System.Environment]::SetEnvironmentVariable("TN_PRACTICE_CODE", "your_practice_code", "User")
+[System.Environment]::SetEnvironmentVariable("TN_USERNAME", "your_username", "User")
+[System.Environment]::SetEnvironmentVariable("TN_PASSWORD", "your_password", "User")
+```
+
+Restart Visual Studio or your terminal after running these commands.
+For CI/CD, set these as repository secrets named `TN_PRACTICE_CODE`, 
+`TN_USERNAME`, and `TN_PASSWORD`.
+
 ## Headless Mode
 Set `Headless = true` in `Config/TestConfig.cs` to run without a visible browser.
 Useful for CI/CD pipelines or reducing visual noise during local runs.
