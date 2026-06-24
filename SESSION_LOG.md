@@ -120,6 +120,27 @@ No accessibility assertions existed in the initial implementation.
 **Why:** TherapyNotes serves clinicians who may use assistive technology.
 Accessibility is not optional in healthcare software.
 
+### 12. API test layer via HttpClient
+No API-level test coverage existed in the initial implementation.
+
+**Fix:** Added `ApiTests.cs` demonstrating HTTP layer testing using HttpClient
+against JSONPlaceholder (jsonplaceholder.typicode.com) — a public REST API
+designed for testing. Four tests covering:
+- GET request returns 200 OK
+- GET response contains expected JSON fields (id, title, body)
+- GET invalid resource returns 404
+- POST request returns 201 Created
+
+**Why:** In a real TherapyNotes context these patterns apply directly to internal
+API routes with authentication headers added via
+client.DefaultRequestHeaders.Authorization. API tests run at 72-156ms vs
+2-4 seconds for UI tests — pushing coverage down to the API layer where
+possible is faster, cheaper, and more reliable than browser-driven tests.
+
+**Note:** JSONPlaceholder is used here as a structural demonstration. Real
+API test suites would target internal endpoints with environment-specific
+base URLs stored in TestConfig.
+
 ## Final Project Structure
 Pages/
   LoginPage.cs
@@ -127,14 +148,16 @@ Pages/
 Tests/
   LoginTests.cs
   AccessibilityTests.cs
+  ApiTests.cs
 Config/
   TestConfig.cs
 
 ## Final Test Suite
-- 9 tests total across 2 test classes
-- Full suite runtime: ~28 seconds
-- Individual happy path: ~4.2 seconds
-- All tests use explicit waits — no static Thread.Sleep
+- 13 tests total across 3 test classes
+- Full suite runtime: ~29 seconds
+- UI tests: 2-4 seconds each (browser-driven)
+- API tests: 72-156ms each (pure HTTP, no browser)
+- All UI tests use explicit waits — no static Thread.Sleep
 
 ## Key Learnings
 - Always inspect real DOM elements rather than assuming field IDs
@@ -146,10 +169,4 @@ Config/
 - Negative tests are as important as happy path tests — especially in healthcare software
 - [Theory] with [InlineData] eliminates test duplication for data-driven scenarios
 - POM centralizes selectors so one UI change requires one code change
-
-## Key Learnings
-- Always inspect real DOM elements rather than assuming field IDs
-- Two-step login flows require understanding the full user journey before writing selectors
-- Explicit waits are always preferable to static sleeps
-- `data-testid` attributes are the gold standard for test selectors
-- Flaky timing issues should be resolved with try/catch lambda waits, not sleep
+- API tests run 20-50x faster than UI tests — push coverage down the stack where possible
