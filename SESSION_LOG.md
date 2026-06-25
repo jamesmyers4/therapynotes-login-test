@@ -33,7 +33,7 @@ The scaffold assumed a single login form. TherapyNotes actually uses a two-step 
 restructured the credential entry accordingly.
 
 ### 4. Incorrect link selector
-The scaffold used `By.LinkText("Log In")` to find the homepage login link. 
+I incorrectly used `By.LinkText("Log In")` to find the homepage login link. 
 The actual element is an `<a>` tag containing a `<span>` — `LinkText` doesn't 
 work here.
 
@@ -47,7 +47,7 @@ The scaffold used `System.Threading.Thread.Sleep(2000)` for page transitions.
 specific elements, making the test faster and more reliable.
 
 ### 6. Improved assertions
-The scaffold checked a generic `h1` element.
+I incorrectly checked a generic `h1` element.
 
 **Fix:** 
 - Used `data-testid='home-welcome-header'` for a more resilient selector
@@ -79,6 +79,7 @@ TestConfig rather than inline strings.
 
 **Why:** One URL or credential change updates every test automatically.
 Also keeps sensitive data out of test logic and in one auditable location.
+(same logic as .env file in TS)
 
 ### 9. Negative test cases
 The initial implementation only covered the happy path.
@@ -139,7 +140,7 @@ possible is faster, cheaper, and more reliable than browser-driven tests.
 
 **Note:** JSONPlaceholder is used here as a structural demonstration. Real
 API test suites would target internal endpoints with environment-specific
-base URLs stored in TestConfig.
+base URLs stored in TestConfig or appsettings.json.
 
 ### 13. Security test coverage
 No security-focused assertions existed in the initial implementation.
@@ -239,25 +240,41 @@ Smoke (safe, every commit), Regression (full suite, nightly), and
 Destructive (deliberate, never unattended against production).
 
 ## Final Project Structure
-Pages/
-  LoginPage.cs
-  DashboardPage.cs
-Tests/
-  LoginTests.cs
-  AccessibilityTests.cs
-  SecurityTests.cs
-  ResponsiveTests.cs
-  ApiTests.cs
-Config/
-  TestConfig.cs
+```
+TherapyNotesUITests/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # GitHub Actions CI workflow
+├── Config/
+│   └── TestConfig.cs             # Centralized config — URLs, credentials, headless toggle
+├── Features/
+│   └── Login.feature             # Reqnroll Gherkin scenarios
+├── Pages/
+│   ├── LoginPage.cs              # Homepage nav, login link, practice code, credentials
+│   └── DashboardPage.cs          # Post-login verification — URL check, welcome header
+├── StepDefinitions/
+│   └── LoginSteps.cs             # Reqnroll step bindings wired to POM
+├── Tests/
+│   ├── LoginTests.cs             # Happy path, negative, data-driven (10 tests)
+│   ├── AccessibilityTests.cs     # aria labels, disabled state, input constraints (5 tests)
+│   ├── SecurityTests.cs          # HTTPS, password masking, auth redirect (3 tests)
+│   ├── ResponsiveTests.cs        # iPhone 14, iPad, Desktop viewports (3 tests)
+│   └── ApiTests.cs               # HTTP layer demo via JSONPlaceholder (4 tests)
+├── README.md
+├── SESSION_LOG.md                # Full implementation history and decisions
+└── CONTEXT.md                    # This file
+```
+---
 
 ## Final Test Suite
-- 25 tests total across 5 test classes
-- Full suite runtime: ~55 seconds (headless, local environment)
+- 28 tests total across 6 test classes (5 xUnit + 1 Reqnroll feature)
+- Non-destructive suite runtime: ~27 seconds (headless, local environment)
+- Full suite runtime: ~75 seconds including destructive tests
 - UI tests: 1.5-5 seconds each (browser-driven)
+- BDD scenarios: 3-5 seconds each (browser-driven)
 - API tests: 67-144ms each (pure HTTP, no browser)
 - All UI tests use explicit waits — no static Thread.Sleep
-- Headless toggle via TestConfig.Headless
+- Headless toggle via TestConfig.Headless / TN_HEADLESS env var
 
 ## Key Learnings
 - Always inspect real DOM elements rather than assuming field IDs

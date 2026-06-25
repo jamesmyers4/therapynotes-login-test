@@ -14,7 +14,7 @@ for TherapyNotes.com, implemented using the Page Object Model pattern.
 - **Design Pattern:** Page Object Model (POM)
 - **API Testing:** HttpClient + System.Text.Json
 - **CI/CD:** GitHub Actions
-- **IDE:** Visual Studio 2022
+- **IDE:** Visual Studio 2026
 
 ## Project Structure
 ```
@@ -120,3 +120,78 @@ Useful for CI/CD pipelines or reducing visual noise during local runs.
 ## Notes
 See [SESSION_LOG.md](SESSION_LOG.md) for full implementation details and 
 decisions made during development.
+
+### The Original Scaffold (as provided and completed during assessment)
+
+```csharp
+using Xunit.Framework;        // ❌ NUnit namespace
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+namespace TherapyNotesUITests
+{
+    [TestFixture]             // ❌ NUnit attribute
+    public class LoginTests      
+    {
+        private IWebDriver driver;
+
+        [SetUp]               // ❌ NUnit attribute — xUnit uses constructor
+        public void Setup()
+        {
+            driver = new ChromeDriver();
+            driver.Manage().Window.Maximize();
+        }
+
+        [Test]                // ❌ NUnit attribute — xUnit uses [Fact]
+        public void LoginToTherapyNotes()
+        {
+            // Navigate to TherapyNotes.com
+            driver.Navigate().GoToUrl("https://www.therapynotes.com");
+
+            // Click the Login link on the homepage
+            var loginLink = driver.FindElement(By.LinkText("Log In")); // ❌ poor selector choice on my part*
+            loginLink.Click();
+
+            System.Threading.Thread.Sleep(2000); // ❌ Static wait — brittle
+
+            // Enter login credentials
+            var usernameField = driver.FindElement(By.Id("PracticeCode"));
+            var usernameField = driver.FindElement(By.Id("Login__UsernameField"));     // ❌ Duplicate variable — won't compile
+            var passwordField = driver.FindElement(By.Id("Login__Password"));
+
+            usernameField.SendKeys("TestUser");
+            usernameField.SendKeys("QAInterviewPractice");
+            passwordField.SendKeys("[REDACTED]");                            // 🔒 Credential removed
+
+            var loginButton = driver.FindElement(By.CssSelector("button[type='submit']")); // ❌ poor selector choice on my part*
+            loginButton.Click();
+
+            System.Threading.Thread.Sleep(2000); // ❌ Static wait — brittle
+
+            var welcomeHeader = driver.FindElement(By.CssSelector("h1"));  // ❌ poor selector choice on my part*
+            Assert.Contains("Welcome", welcomeHeader.Text);
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            driver.Quit();
+        }
+    }
+}
+```
+
+### Issues Identified and Fixed
+
+| # | Problem | Fix Applied |
+|---|---------|-------------|
+| 1 | `[TestFixture]`, `[SetUp]`, `[Test]` are **NUnit** attributes — scaffold was labeled xUnit | Rewrote using xUnit conventions: constructor setup, `IDisposable` teardown, `[Fact]`/`[Theory]` |
+| 2 | Duplicate `var usernameField` declaration — won't compile | Renamed to `practiceCodeField` to reflect actual purpose |
+| 3 | IDs `"username"`, `"practice_code"`, `"password"` don't exist in the DOM | DOM-inspected live site; real IDs: `PracticeCode`, `Login__UsernameField`, `Login__Password` |
+| 4 | No awareness of two-step login flow | Added Practice Code step → Continue → then Username/Password |
+| 5 | `By.LinkText("Log In")` fails on the homepage anchor element | Replaced with `By.CssSelector("a[href='/app/login/']")` |
+| 6 | `By.CssSelector("button[type='submit']")` matches any submit button | Replaced with `data-testid` selectors specific to TherapyNotes elements |
+| 7 | `By.CssSelector("h1")` matches any heading on the page | Replaced with `[data-testid='home-welcome-header']` |
+| 8 | `System.Threading.Thread.Sleep(2000)` used twice | Replaced with `WebDriverWait` + explicit conditions throughout |
+| 9 | `[TearDown]` Preserved; converted to `Dispose()` via `IDisposable` in the xUnit rewrite |
+
+After fixing the scaffold, the suite was expanded into the full 28-test implementation above.

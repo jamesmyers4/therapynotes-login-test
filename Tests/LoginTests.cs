@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using TherapyNotesUITests.Pages;
+using System.ComponentModel.DataAnnotations;
 
 namespace TherapyNotesUITests.Tests
 {
@@ -89,11 +90,12 @@ namespace TherapyNotesUITests.Tests
         }
 
         [Theory]
-        [InlineData("", "TestUser", "HorshamPA19044@@")]
-        [InlineData("QAInterviewPractice", "", "HorshamPA19044@@")]
+        [InlineData("", "TestUser", "use_config")]
+        [InlineData("QAInterviewPractice", "", "use_config")]
         [InlineData("QAInterviewPractice", "TestUser", "")]
         public void EmptyFields_PreventLogin(string practiceCode, string username, string password)
         {
+            var resolvedPassword = password == "use_config" ? TestConfig.Password : password;
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             var loginPage = new LoginPage(driver, wait);
             loginPage.Navigate();

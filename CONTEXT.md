@@ -20,7 +20,7 @@ real test suite in a professional shop would be.
 - **Design Pattern:** Page Object Model (POM)
 - **API Testing:** HttpClient + System.Text.Json
 - **CI/CD:** GitHub Actions
-- **IDE:** Visual Studio 2022
+- **IDE:** Visual Studio 2026
 
 ---
 
@@ -147,12 +147,10 @@ Tests are tagged by risk profile to prevent accidental account lockout:
 - **Rate limiting / lockout** — would lock the test account, destructive
 - **Internal API routes** — not publicly documented, require internal auth tokens
 - **Database layer** — no access to TherapyNotes internal infrastructure
-- - **Account lockout** — triggering lockout requires 5+ failed logins and locks 
+- **Account lockout** — triggering lockout requires 5+ failed logins and locks 
   the real account for 15 minutes. Discovered during test development and documented 
   in SESSION_LOG entry #19. Tagged as Destructive to prevent accidental triggering.
 
-All of the above are valid test cases in a real team context with proper
-test environment access.
 
 ---
 
@@ -167,7 +165,7 @@ test environment access.
 
 ---
 
-## If Expanding This Suite
+## If Expanding This Suite (TODO)
 - Add appsettings.json for environment-specific config
 - Add parallel test execution (xUnit supports this natively)
 - Add screenshot on failure for debugging
